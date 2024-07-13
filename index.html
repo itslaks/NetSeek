@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Port Scanner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            background-color: #111;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .container:before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, transparent 50%, #ff0 50%);
+            border-radius: 50%;
+        }
+        .container:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(225deg, transparent 50%, #ff0 50%);
+            border-radius: 50%;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: #333;
+            color: #fff;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #ff0;
+            color: #000;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .form-group button:hover {
+            background-color: #ffe066;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #222;
+            border: 1px solid #333;
+            border-radius: 5px;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .result.show {
+            display: block;
+        }
+        .result pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #fff;
+        }
+        /* Loading Screen Styles */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            color: #ff0;
+            font-size: 2rem;
+            z-index: 1000;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .loading-screen.show {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>INFOSIGHT - IP Finder</h2>
+        <form id="port-scanner-form" method="post">
+            <div class="form-group">
+                <label for="domain">Enter a website URL or domain:</label>
+                <input type="text" id="domain" name="domain" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Scan</button>
+            </div>
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <span>Loading...</span>
+    </div>
+
+    <script>
+        document.getElementById('port-scanner-form').onsubmit = async function(event) {
+            event.preventDefault();
+            
+            // Show loading screen
+            document.getElementById('loading-screen').classList.add('show');
+            
+            const domain = document.getElementById('domain').value;
+            const response = await fetch('/scan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ domain })
+            });
+            const result = await response.json();
+            
+            // Hide loading screen
+            document.getElementById('loading-screen').classList.remove('show');
+            
+            // Display results
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<h3>${result.message}</h3><pre>${JSON.stringify(result.ip_info, null, 2)}</pre>`;
+            resultDiv.classList.add('show');
+        };
+    </script>
+</body>
+</html>
